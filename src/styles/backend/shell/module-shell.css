@@ -1,0 +1,162 @@
+/* ============================================================================
+   MODULE SHELL
+   ============================================================================ */
+
+.module {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+}
+
+.module__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+  background-color: transparent;
+}
+
+.module__header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.module__spacer {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.module__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  flex-wrap: wrap;
+}
+
+
+.module__tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  overflow-x: auto;
+  padding-bottom: 1px;
+}
+
+.module__tabs--wrap {
+  flex-wrap: wrap;
+  overflow-x: visible;
+  background: var(--color-surface-subtle);
+}
+
+.module__tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: var(--text-s);
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.module__tab:hover {
+  color: var(--text-dark);
+  background: var(--color-hover);
+}
+
+.module__tab:disabled,
+.module__tab[aria-disabled='true'] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.module__tab--active {
+  color: var(--primary);
+}
+
+.module__content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.module__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: var(--space-s);
+}
+
+/* ============================================================================
+   MODULE SHELL REFRESH
+   ============================================================================ */
+
+.module__header {
+  gap: 12px;
+}
+
+.module__toolbar {
+  padding: 12px 14px;
+  border: 1px solid #dce6ef;
+  border-radius: var(--radius-card);
+  background: #fff;
+  box-shadow: var(--shadow-form);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.module__toolbar-main {
+  padding: 0;
+}
+
+.module__tabs {
+  gap: 0.35rem;
+  width: fit-content;
+  max-width: 100%;
+  padding: 4px;
+  border: 1px solid #dce6ef;
+  border-radius: var(--radius-form);
+  background: #f8fafc;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.module__tab {
+  font-family: var(--heading-family);
+  font-size: var(--text-s);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  min-height: 2.75rem;
+  padding: 0.62rem 1.2rem;
+  border-radius: var(--radius-btn);
+  transition:
+    background 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.module__tab:hover {
+  background: rgba(245, 163, 30, 0.1);
+  color: var(--text-dark);
+}
+
+.module__tab--active {
+  color: var(--secondary-dark);
+  background: var(--secondary);
+  box-shadow: var(--shadow-form);
+}
+
+.module__content {
+  gap: var(--space-m);
+}

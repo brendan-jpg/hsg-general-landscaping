@@ -1,0 +1,64 @@
+/* ============================================================================
+   APP SHELL
+   ============================================================================ */
+
+.shell {
+  height: 100dvh;
+  display: grid;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  background: var(--bg-light);
+  overflow: hidden;
+}
+
+.shell--hsg {
+  --color-bg: var(--bg-light);
+  --color-surface: var(--card-bg);
+  --color-surface-raised: var(--card-bg);
+  --color-hover: color-mix(in srgb, var(--primary) 10%, white);
+  --color-border: var(--card-border-color);
+  --color-border-light: color-mix(in srgb, var(--card-border-color) 52%, white);
+}
+
+.shell--hsg .btn--primary {
+  border-radius: var(--radius-btn);
+  font-weight: 600;
+}
+
+.shell--hsg .module__tab--active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.shell--collapsed {
+  grid-template-columns: var(--sidebar-collapsed-width) minmax(0, 1fr);
+}
+
+.shell__content {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.shell__main {
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--card-padding);
+  background:
+    linear-gradient(180deg, #eef3f8 0%, var(--bg-light) 100%);
+}
+
+@media (max-width: 1024px) {
+  .shell,
+  .shell--collapsed {
+    grid-template-columns: 1fr;
+  }
+
+  .shell__main {
+    padding: var(--space-m);
+  }
+}

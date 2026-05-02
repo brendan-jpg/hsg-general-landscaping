@@ -1,0 +1,19 @@
+Template/page system + seed script export
+Created: 2026-02-25
+
+Files:
+src/lib/content/templatePages.ts
+src/components/backend/TemplatePageEditor.tsx
+src/components/shared/TemplatePageRenderer.tsx
+src/components/backend/PageEditorForm.tsx
+src/components/backend/ServiceEditorForm.tsx
+src/components/backend/AreaEditorForm.tsx
+src/lib/actions/index.ts
+src/app/(frontend)/[slug]/page.tsx
+src/app/(frontend)/about/page.tsx
+src/app/(frontend)/contact/page.tsx
+src/app/(frontend)/services/[slug]/page.tsx
+src/app/(frontend)/areas/[slug]/page.tsx
+src/app/(frontend)/areas/[slug]/[serviceSlug]/page.tsx
+scripts/create-client-site.mjs
+package.json

@@ -1,0 +1,20 @@
+/* ============================================================================
+   GLOBALS
+   Master stylesheet — import order matters.
+   ============================================================================ */
+
+/* 1. Backend tokens + foundation reset first */
+@import './backend/tokens.css';
+@import './shared/reset.css';
+
+/* 2. Backend UI primitives */
+@import './backend/ui.css';
+
+/* 3. Backend auth/login styles */
+@import './backend/auth.css';
+@import './backend/trial.css';
+
+.pac-container {
+  z-index: 10000 !important;
+}
+
