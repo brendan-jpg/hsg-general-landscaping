@@ -316,10 +316,6 @@ export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const isDashboardPath = pathname.startsWith('/dashboard');
   const isAuthPath = pathname === '/login' || pathname === '/reset-password' || pathname.startsWith('/reset-password/');
-  if (isDashboardPath) {
-    return NextResponse.next({ request });
-  }
-
   const canonicalRedirect = await maybeRedirectToCanonicalHost(request);
   if (canonicalRedirect) return canonicalRedirect;
 
