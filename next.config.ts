@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 function getSupabaseImageHosts() {
-  const hosts = new Set<string>(["pqdhuovprkicjaucqyjw.supabase.co"]);
+  const hosts = new Set<string>(["pqdhuovprkicjaucqyjw.supabase.co", "sepbhgqkowpmqzynormq.supabase.co"]);
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
   if (supabaseUrl) {
@@ -36,4 +36,3 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
-
