@@ -220,12 +220,102 @@ async function verifyRecaptchaToken(options: {
   token: string;
   expectedAction: string;
 }) {
+  const standardSecretKey = process.env.GOOGLE_RECAPTCHA_SECRET_KEY?.trim() || "";
+  if (standardSecretKey) {
+    const token = options.token.trim();
+    if (!token) {
+      throw new Error("Spam verification failed. Please try again.");
+    }
+
+    const remoteIp = await getRequestIpAddress();
+    const requestHost = await getRequestHostName();
+    const verificationBody = new URLSearchParams({
+      secret: standardSecretKey,
+      response: token,
+    });
+    if (remoteIp) verificationBody.set("remoteip", remoteIp);
+
+    const response = await fetch("https://www.google.com/recaptcha/api/siteverify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: verificationBody,
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      console.error("reCAPTCHA request failed", {
+        status: response.status,
+        statusText: response.statusText,
+        requestHost,
+        expectedAction: options.expectedAction,
+      });
+      throw new Error("Spam verification failed. Please try again.");
+    }
+
+    const result = (await response.json()) as {
+      success?: boolean;
+      score?: number;
+      action?: string;
+      hostname?: string;
+      challenge_ts?: string;
+      "error-codes"?: string[];
+    };
+
+    if (!result.success) {
+      console.error("reCAPTCHA rejected token", {
+        requestHost,
+        expectedAction: options.expectedAction,
+        hostname: result.hostname ?? null,
+        action: result.action ?? null,
+        errorCodes: result["error-codes"] ?? [],
+      });
+      throw new Error("Spam verification failed. Please try again.");
+    }
+
+    if (result.action && result.action.trim() !== options.expectedAction) {
+      console.error("reCAPTCHA action mismatch", {
+        requestHost,
+        expectedAction: options.expectedAction,
+        receivedAction: result.action,
+        hostname: result.hostname ?? null,
+      });
+      throw new Error("Spam verification failed. Please try again.");
+    }
+
+    const verifiedHost = (result.hostname ?? "").trim().toLowerCase();
+    if (verifiedHost && requestHost && verifiedHost !== requestHost) {
+      console.error("reCAPTCHA hostname mismatch", {
+        requestHost,
+        verifiedHost,
+        expectedAction: options.expectedAction,
+      });
+      throw new Error("Spam verification failed. Please try again.");
+    }
+
+    if (typeof result.score === "number" && result.score < 0.5) {
+      console.error("reCAPTCHA low score", {
+        requestHost,
+        verifiedHost: verifiedHost || null,
+        expectedAction: options.expectedAction,
+        score: result.score,
+      });
+      throw new Error("Your submission looked suspicious. Please try again.");
+    }
+
+    return;
+  }
+
   const projectId =
     process.env.RECAPTCHA_ENTERPRISE_PROJECT_ID?.trim() ||
     process.env.GOOGLE_CLOUD_PROJECT_ID?.trim() ||
     "";
   const apiKey = process.env.RECAPTCHA_ENTERPRISE_API_KEY?.trim() || "";
-  const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY?.trim() || "";
+  const siteKey =
+    process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY?.trim() ||
+    process.env.GOOGLE_RECAPTCHA_SITE_KEY?.trim() ||
+    "";
   if (!projectId || !apiKey || !siteKey) return;
 
   const token = options.token.trim();
@@ -554,11 +644,15 @@ export async function submitForm(formData: FormData) {
   const recaptchaToken = ((formData.get("recaptcha_token") as string) || "").trim();
   const recaptchaAction = ((formData.get("recaptcha_action") as string) || "").trim() || "frontend_form_submit";
 
-  if (
-    process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY?.trim() &&
-    (process.env.RECAPTCHA_ENTERPRISE_PROJECT_ID?.trim() || process.env.GOOGLE_CLOUD_PROJECT_ID?.trim()) &&
-    process.env.RECAPTCHA_ENTERPRISE_API_KEY?.trim()
-  ) {
+  const hasStandardRecaptcha =
+    Boolean(process.env.GOOGLE_RECAPTCHA_SITE_KEY?.trim() || process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY?.trim()) &&
+    Boolean(process.env.GOOGLE_RECAPTCHA_SECRET_KEY?.trim());
+  const hasEnterpriseRecaptcha =
+    Boolean(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY?.trim() || process.env.GOOGLE_RECAPTCHA_SITE_KEY?.trim()) &&
+    Boolean(process.env.RECAPTCHA_ENTERPRISE_PROJECT_ID?.trim() || process.env.GOOGLE_CLOUD_PROJECT_ID?.trim()) &&
+    Boolean(process.env.RECAPTCHA_ENTERPRISE_API_KEY?.trim());
+
+  if (hasStandardRecaptcha || hasEnterpriseRecaptcha) {
     await verifyRecaptchaToken({
       token: recaptchaToken,
       expectedAction: recaptchaAction,

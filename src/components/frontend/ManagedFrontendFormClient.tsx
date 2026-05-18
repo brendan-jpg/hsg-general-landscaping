@@ -55,6 +55,7 @@ declare global {
   interface Window {
     grecaptcha?: {
       ready?: (callback: () => void) => void;
+      execute?: (siteKey: string, options: { action: string }) => Promise<string>;
       enterprise?: {
         ready?: (callback: () => void) => void;
         execute: (siteKey: string, options: { action: string }) => Promise<string>;
@@ -143,19 +144,19 @@ async function getRecaptchaToken(siteKey: string) {
 
   const grecaptcha = window.grecaptcha;
   const enterprise = grecaptcha?.enterprise;
-  if (!enterprise?.execute) {
+  const execute = enterprise?.execute?.bind(enterprise) ?? grecaptcha?.execute?.bind(grecaptcha);
+  if (!execute) {
     throw new Error('Spam protection is still loading. Please try again.');
   }
 
   return await new Promise<string>((resolve, reject) => {
     const executeToken = () => {
-      enterprise
-        .execute(siteKey, { action: 'frontend_form_submit' })
+      execute(siteKey, { action: 'frontend_form_submit' })
         .then(resolve)
         .catch(() => reject(new Error('Unable to verify spam protection. Please try again.')));
     };
 
-    if (typeof enterprise.ready === 'function') {
+    if (typeof enterprise?.ready === 'function') {
       enterprise.ready(executeToken);
       return;
     }
@@ -503,7 +504,7 @@ export default function ManagedFrontendFormClient({
     <>
       {recaptchaSiteKey ? (
         <Script
-          src={`https://www.google.com/recaptcha/enterprise.js?render=${encodeURIComponent(recaptchaSiteKey)}`}
+          src={`https://www.google.com/recaptcha/api.js?render=${encodeURIComponent(recaptchaSiteKey)}`}
           strategy="afterInteractive"
           onReady={() => setRecaptchaState('loaded')}
           onError={() => setRecaptchaState('error')}
